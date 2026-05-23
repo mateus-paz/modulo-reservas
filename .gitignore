@@ -161,3 +161,11 @@ buildNumber.properties
 
 # End of https://www.toptal.com/developers/gitignore/api/intellij,java,maven
 .idea
+
+# Local and container runtime artifacts
+.vscode/
+.env*
+.DS_Store
+Thumbs.db
+*.tmp
+*.swp

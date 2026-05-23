@@ -8,11 +8,11 @@ Este guia descreve a execucao alvo da Fase 1: subir PostgreSQL, iniciar a aplica
 
 - Java 21
 - Docker com suporte a Compose
-- Maven Wrapper presente no repositorio
+- Maven 3.8+ instalado localmente, ou Docker para executar a imagem da aplicacao
 
 ## Start PostgreSQL
 
-O plano inclui um `compose.yaml` com um servico `postgres` e banco `reservas`. Apos sua implementacao:
+O `compose.yaml` inclui um servico `postgres` e banco `reservas`:
 
 ```bash
 docker compose up -d postgres
@@ -29,15 +29,21 @@ export SPRING_DATASOURCE_PASSWORD=reservas
 ## Run The Application
 
 ```bash
-./mvnw spring-boot:run
+mvn spring-boot:run
 ```
 
 Ao inicializar, o Flyway deve aplicar as migrations de `src/main/resources/db/migration/`; falha de conexao ou migration invalida deve impedir a inicializacao bem-sucedida.
 
+Para executar aplicacao e banco em containers:
+
+```bash
+docker compose up --build app
+```
+
 ## Execute Automated Checks
 
 ```bash
-./mvnw test
+mvn test
 ```
 
 Os testes planejados devem cobrir:
@@ -45,7 +51,14 @@ Os testes planejados devem cobrir:
 - carregamento da aplicacao com configuracao de teste;
 - aplicacao das migrations contra PostgreSQL;
 - validade da restricao persistente que ja impede duplicidade de confirmacao;
-- contrato HTTP de confirmacao, campos obrigatorios e conflito para vaga previamente confirmada.
+- contrato HTTP de confirmacao, campos obrigatorios e conflito para vaga previamente confirmada;
+- estrutura OpenAPI dos resultados atuais e do resultado futuro `REQUEST_ID_INCONSISTENTE`.
+
+Verificacao executada em 2026-05-23:
+
+- `mvn test` executou 10 testes com sucesso;
+- os testes de integracao iniciaram PostgreSQL 16 via Testcontainers e aplicaram `V1__create_reservation_foundation.sql` pelo Flyway;
+- a tentativa de segunda reserva confirmada para a mesma vaga foi rejeitada pelo indice unico da migration.
 
 ## Inspect The HTTP Contract
 
@@ -76,4 +89,4 @@ curl -i -X POST http://localhost:8080/reservas \
 | Vaga previamente confirmada | `409` | `VAGA_EM_CONFLITO` |
 | `requestId` reutilizado com outro payload (contrato futuro) | `409` | `REQUEST_ID_INCONSISTENTE` |
 
-Nesta entrega, confirmacao, validacao e conflito para vaga previamente confirmada devem ser executaveis, e a migration deve impedir duplicidade de confirmacao. O tratamento controlado de disputa simultanea e o replay persistente sao alvo da fase seguinte.
+Nesta entrega, confirmacao, validacao e conflito para vaga previamente confirmada sao os comportamentos executaveis, e a migration impede duplicidade de confirmacao. Qualquer reapresentacao de `requestId`, incluindo replay ou uso inconsistente, permanece fora do comportamento executavel suportado e sera tratada na fase seguinte.

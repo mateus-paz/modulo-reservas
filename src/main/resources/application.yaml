@@ -1,3 +1,13 @@
 spring:
   application:
     name: reservas
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/reservas}
+    username: ${SPRING_DATASOURCE_USERNAME:reservas}
+    password: ${SPRING_DATASOURCE_PASSWORD:reservas}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+  flyway:
+    enabled: true

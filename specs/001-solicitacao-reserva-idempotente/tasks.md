@@ -18,10 +18,10 @@
 
 **Purpose**: Preparar dependencias e execucao local/conteinerizada para PostgreSQL e testes.
 
-- [ ] T001 Atualizar dependencias de validacao e testes PostgreSQL/Testcontainers em `pom.xml`
-- [ ] T002 [P] Configurar datasource PostgreSQL, JPA e Flyway para execucao local em `src/main/resources/application.yaml`
-- [ ] T003 [P] Definir o servico PostgreSQL local e variaveis da aplicacao em `compose.yaml`
-- [ ] T004 [P] Criar a imagem executavel Spring Boot para uso conteinerizado em `Dockerfile`
+- [X] T001 Atualizar dependencias de validacao e testes PostgreSQL/Testcontainers em `pom.xml`
+- [X] T002 [P] Configurar datasource PostgreSQL, JPA e Flyway para execucao local em `src/main/resources/application.yaml`
+- [X] T003 [P] Definir o servico PostgreSQL local e variaveis da aplicacao em `compose.yaml`
+- [X] T004 [P] Criar a imagem executavel Spring Boot para uso conteinerizado em `Dockerfile`
 
 ---
 
@@ -31,12 +31,12 @@
 
 **CRITICAL**: Nenhuma historia pode ser entregue antes da migration e das entidades compartilhadas estarem disponiveis.
 
-- [ ] T005 Criar a migration de `vaga`, `reserva` e `resultado_requisicao`, incluindo estados, chaves e indice unico de reserva confirmada por vaga, em `src/main/resources/db/migration/V1__create_reservation_foundation.sql`
-- [ ] T006 [P] Criar enums persistentes de estado e resultado em `src/main/java/com/mateuspaz/reservas/reserva/persistence/VagaStatus.java`, `src/main/java/com/mateuspaz/reservas/reserva/persistence/ReservaStatus.java` e `src/main/java/com/mateuspaz/reservas/reserva/persistence/ResultadoSolicitacao.java`
-- [ ] T007 Criar entidades JPA mapeadas para a migration em `src/main/java/com/mateuspaz/reservas/reserva/persistence/VagaEntity.java`, `src/main/java/com/mateuspaz/reservas/reserva/persistence/ReservaEntity.java` e `src/main/java/com/mateuspaz/reservas/reserva/persistence/ResultadoRequisicaoEntity.java`
-- [ ] T008 Criar repositorios JPA para as tres entidades em `src/main/java/com/mateuspaz/reservas/reserva/persistence/VagaRepository.java`, `src/main/java/com/mateuspaz/reservas/reserva/persistence/ReservaRepository.java` e `src/main/java/com/mateuspaz/reservas/reserva/persistence/ResultadoRequisicaoRepository.java`
-- [ ] T009 [P] Configurar perfil de integracao PostgreSQL e base Testcontainers em `src/test/resources/application-integration.yaml` e `src/test/java/com/mateuspaz/reservas/support/PostgresIntegrationTest.java`
-- [ ] T010 Validar inicializacao da aplicacao com migrations aplicadas em PostgreSQL em `src/test/java/com/mateuspaz/reservas/ReservasPostgresApplicationTests.java`
+- [X] T005 Criar a migration de `vaga`, `reserva` e `resultado_requisicao`, incluindo estados, chaves e indice unico de reserva confirmada por vaga, em `src/main/resources/db/migration/V1__create_reservation_foundation.sql`
+- [X] T006 [P] Criar enums persistentes de estado e resultado em `src/main/java/com/mateuspaz/reservas/reserva/persistence/VagaStatus.java`, `src/main/java/com/mateuspaz/reservas/reserva/persistence/ReservaStatus.java` e `src/main/java/com/mateuspaz/reservas/reserva/persistence/ResultadoSolicitacao.java`
+- [X] T007 Criar entidades JPA mapeadas para a migration em `src/main/java/com/mateuspaz/reservas/reserva/persistence/VagaEntity.java`, `src/main/java/com/mateuspaz/reservas/reserva/persistence/ReservaEntity.java` e `src/main/java/com/mateuspaz/reservas/reserva/persistence/ResultadoRequisicaoEntity.java`
+- [X] T008 Criar repositorios JPA para as tres entidades em `src/main/java/com/mateuspaz/reservas/reserva/persistence/VagaRepository.java`, `src/main/java/com/mateuspaz/reservas/reserva/persistence/ReservaRepository.java` e `src/main/java/com/mateuspaz/reservas/reserva/persistence/ResultadoRequisicaoRepository.java`
+- [X] T009 [P] Configurar perfil de integracao PostgreSQL e base Testcontainers em `src/test/resources/application-integration.yaml` e `src/test/java/com/mateuspaz/reservas/support/PostgresIntegrationTest.java`
+- [X] T010 Validar inicializacao da aplicacao com migrations aplicadas em PostgreSQL em `src/test/java/com/mateuspaz/reservas/ReservasPostgresApplicationTests.java`
 
 **Checkpoint**: Banco, migrations, mapeamentos e ambiente de integracao prontos para as historias.
 
@@ -50,14 +50,14 @@
 
 ### Tests for User Story 1
 
-- [ ] T011 [P] [US1] Criar teste de contrato para resposta `201 CONFIRMADA` de `POST /reservas` em `src/test/java/com/mateuspaz/reservas/reserva/api/SolicitacaoReservaSuccessContractTest.java`
-- [ ] T012 [P] [US1] Criar teste de integracao da confirmacao e persistencia da reserva/resultado em `src/test/java/com/mateuspaz/reservas/reserva/application/ConfirmarReservaIntegrationTest.java`
+- [X] T011 [P] [US1] Criar teste de contrato para resposta `201 CONFIRMADA` de `POST /reservas` em `src/test/java/com/mateuspaz/reservas/reserva/api/SolicitacaoReservaSuccessContractTest.java`
+- [X] T012 [P] [US1] Criar teste de integracao da confirmacao e persistencia da reserva/resultado em `src/test/java/com/mateuspaz/reservas/reserva/application/ConfirmarReservaIntegrationTest.java`
 
 ### Implementation for User Story 1
 
-- [ ] T013 [P] [US1] Criar DTOs de requisicao e confirmacao conforme OpenAPI em `src/main/java/com/mateuspaz/reservas/reserva/api/SolicitacaoReservaRequest.java` e `src/main/java/com/mateuspaz/reservas/reserva/api/ReservaConfirmadaResponse.java`
-- [ ] T014 [US1] Implementar o caso de uso que confirma vaga livre e persiste reserva e resultado `CONFIRMADA` em `src/main/java/com/mateuspaz/reservas/reserva/application/SolicitacaoReservaService.java`
-- [ ] T015 [US1] Expor `POST /reservas` e mapear resposta de confirmacao em `src/main/java/com/mateuspaz/reservas/reserva/api/SolicitacaoReservaController.java`
+- [X] T013 [P] [US1] Criar DTOs de requisicao e confirmacao conforme OpenAPI em `src/main/java/com/mateuspaz/reservas/reserva/api/SolicitacaoReservaRequest.java` e `src/main/java/com/mateuspaz/reservas/reserva/api/ReservaConfirmadaResponse.java`
+- [X] T014 [US1] Implementar o caso de uso que confirma vaga livre e persiste reserva e resultado `CONFIRMADA` em `src/main/java/com/mateuspaz/reservas/reserva/application/SolicitacaoReservaService.java`
+- [X] T015 [US1] Expor `POST /reservas` e mapear resposta de confirmacao em `src/main/java/com/mateuspaz/reservas/reserva/api/SolicitacaoReservaController.java`
 
 **Checkpoint**: A solicitacao valida e confirmada e testavel isoladamente como MVP.
 
@@ -71,13 +71,13 @@
 
 ### Tests for User Story 2
 
-- [ ] T016 [P] [US2] Criar testes de contrato para campos obrigatorios e formato UUID invalido em `src/test/java/com/mateuspaz/reservas/reserva/api/SolicitacaoReservaValidationContractTest.java`
+- [X] T016 [P] [US2] Criar testes de contrato para campos obrigatorios e formato UUID invalido em `src/test/java/com/mateuspaz/reservas/reserva/api/SolicitacaoReservaValidationContractTest.java`
 
 ### Implementation for User Story 2
 
-- [ ] T017 [US2] Aplicar validacoes de entrada do endpoint em `src/main/java/com/mateuspaz/reservas/reserva/api/SolicitacaoReservaRequest.java` e `src/main/java/com/mateuspaz/reservas/reserva/api/SolicitacaoReservaController.java`
-- [ ] T018 [P] [US2] Criar modelos HTTP de erro de validacao em `src/main/java/com/mateuspaz/reservas/reserva/api/ApiErrorDetail.java` e `src/main/java/com/mateuspaz/reservas/reserva/api/ValidationErrorResponse.java`
-- [ ] T019 [US2] Mapear falhas de validacao para `400 VALIDATION_ERROR` em `src/main/java/com/mateuspaz/reservas/reserva/api/ReservaExceptionHandler.java`
+- [X] T017 [US2] Aplicar validacoes de entrada do endpoint em `src/main/java/com/mateuspaz/reservas/reserva/api/SolicitacaoReservaRequest.java` e `src/main/java/com/mateuspaz/reservas/reserva/api/SolicitacaoReservaController.java`
+- [X] T018 [P] [US2] Criar modelos HTTP de erro de validacao em `src/main/java/com/mateuspaz/reservas/reserva/api/ApiErrorDetail.java` e `src/main/java/com/mateuspaz/reservas/reserva/api/ValidationErrorResponse.java`
+- [X] T019 [US2] Mapear falhas de validacao para `400 VALIDATION_ERROR` em `src/main/java/com/mateuspaz/reservas/reserva/api/ReservaExceptionHandler.java`
 
 **Checkpoint**: Entradas invalidas sao rejeitadas independentemente do fluxo de conflito.
 
@@ -91,15 +91,15 @@
 
 ### Tests for User Story 3
 
-- [ ] T020 [P] [US3] Criar teste de contrato para resposta `409 VAGA_EM_CONFLITO` em `src/test/java/com/mateuspaz/reservas/reserva/api/SolicitacaoReservaConflictContractTest.java`
-- [ ] T021 [P] [US3] Criar teste PostgreSQL para o indice unico de reserva confirmada por vaga em `src/test/java/com/mateuspaz/reservas/reserva/persistence/ReservaConfirmationConstraintIntegrationTest.java`
-- [ ] T022 [P] [US3] Criar teste de integracao para conflito sequencial sem nova reserva em `src/test/java/com/mateuspaz/reservas/reserva/application/RejeitarVagaConfirmadaIntegrationTest.java`
+- [X] T020 [P] [US3] Criar teste de contrato para resposta `409 VAGA_EM_CONFLITO` em `src/test/java/com/mateuspaz/reservas/reserva/api/SolicitacaoReservaConflictContractTest.java`
+- [X] T021 [P] [US3] Criar teste PostgreSQL para o indice unico de reserva confirmada por vaga em `src/test/java/com/mateuspaz/reservas/reserva/persistence/ReservaConfirmationConstraintIntegrationTest.java`
+- [X] T022 [P] [US3] Criar teste de integracao para conflito sequencial sem nova reserva em `src/test/java/com/mateuspaz/reservas/reserva/application/RejeitarVagaConfirmadaIntegrationTest.java`
 
 ### Implementation for User Story 3
 
-- [ ] T023 [P] [US3] Criar resposta e excecao de conflito de vaga em `src/main/java/com/mateuspaz/reservas/reserva/api/ConflictErrorResponse.java` e `src/main/java/com/mateuspaz/reservas/reserva/application/VagaEmConflitoException.java`
-- [ ] T024 [US3] Implementar verificacao de vaga previamente confirmada e persistencia do resultado `CONFLITO_VAGA` em `src/main/java/com/mateuspaz/reservas/reserva/application/SolicitacaoReservaService.java`
-- [ ] T025 [US3] Mapear conflito conhecido para `409 VAGA_EM_CONFLITO` sem tratar corridas simultaneas ou `REQUEST_ID_INCONSISTENTE` em `src/main/java/com/mateuspaz/reservas/reserva/api/ReservaExceptionHandler.java`
+- [X] T023 [P] [US3] Criar resposta e excecao de conflito de vaga em `src/main/java/com/mateuspaz/reservas/reserva/api/ConflictErrorResponse.java` e `src/main/java/com/mateuspaz/reservas/reserva/application/VagaEmConflitoException.java`
+- [X] T024 [US3] Implementar verificacao de vaga previamente confirmada e persistencia do resultado `CONFLITO_VAGA` em `src/main/java/com/mateuspaz/reservas/reserva/application/SolicitacaoReservaService.java`
+- [X] T025 [US3] Mapear conflito conhecido para `409 VAGA_EM_CONFLITO` sem tratar corridas simultaneas ou `REQUEST_ID_INCONSISTENTE` em `src/main/java/com/mateuspaz/reservas/reserva/api/ReservaExceptionHandler.java`
 
 **Checkpoint**: Os tres resultados executaveis desta entrega estao implementados e a protecao persistente foi comprovada.
 
@@ -109,9 +109,9 @@
 
 **Purpose**: Finalizar verificacao operacional e manter a documentacao aderente ao comportamento entregue.
 
-- [ ] T026 [P] Criar verificacao automatizada do contrato OpenAPI para os schemas e codigos definidos de `POST /reservas`, incluindo `REQUEST_ID_INCONSISTENTE` como resposta futura nao executavel, em `src/test/java/com/mateuspaz/reservas/reserva/api/ReservasOpenApiContractTest.java`
-- [ ] T027 [P] Revisar exemplos de execucao, resultados atuais e comportamentos futuros em `specs/001-solicitacao-reserva-idempotente/quickstart.md`
-- [ ] T028 Executar a suite e validar inicializacao com PostgreSQL conteinerizado e migrations Flyway aplicadas, registrando eventuais ajustes de execucao em `specs/001-solicitacao-reserva-idempotente/quickstart.md`
+- [X] T026 [P] Criar verificacao automatizada do contrato OpenAPI para os schemas e codigos definidos de `POST /reservas`, incluindo `REQUEST_ID_INCONSISTENTE` como resposta futura nao executavel, em `src/test/java/com/mateuspaz/reservas/reserva/api/ReservasOpenApiContractTest.java`
+- [X] T027 [P] Revisar exemplos de execucao, resultados atuais e comportamentos futuros em `specs/001-solicitacao-reserva-idempotente/quickstart.md`
+- [X] T028 Executar a suite e validar inicializacao com PostgreSQL conteinerizado e migrations Flyway aplicadas, registrando eventuais ajustes de execucao em `specs/001-solicitacao-reserva-idempotente/quickstart.md`
 
 ---
 
