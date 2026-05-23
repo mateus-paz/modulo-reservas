@@ -1,0 +1,153 @@
+openapi: 3.0.3
+info:
+  title: Reservas API
+  version: 0.1.0
+  description: Contrato da operacao de solicitacao de reserva da PoC.
+paths:
+  /reservas:
+    post:
+      operationId: solicitarReserva
+      summary: Solicita a confirmacao de uma reserva para uma vaga
+      description: >
+        Recebe a intencao identificada por requestId. Reenvios consistentes
+        devem reproduzir o resultado original; reuso do requestId com dados
+        distintos deve ser rejeitado.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SolicitacaoReservaRequest'
+            examples:
+              validRequest:
+                value:
+                  vagaId: 1d160ddf-a9bd-4c08-a7e3-75577d13db93
+                  clienteId: 70d06015-f720-4bb8-a68b-9df34da75970
+                  requestId: 995feb99-2517-462f-b212-09acdad109a8
+      responses:
+        '201':
+          description: Reserva confirmada com sucesso.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReservaConfirmadaResponse'
+        '400':
+          description: Solicitacao nao pode ser avaliada devido a dados invalidos.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationErrorResponse'
+        '409':
+          description: Vaga em conflito ou reutilizacao inconsistente do requestId.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConflictErrorResponse'
+              examples:
+                vagaEmConflito:
+                  value:
+                    requestId: 995feb99-2517-462f-b212-09acdad109a8
+                    code: VAGA_EM_CONFLITO
+                    message: A vaga solicitada nao esta disponivel para confirmacao.
+                requestIdInconsistente:
+                  value:
+                    requestId: 995feb99-2517-462f-b212-09acdad109a8
+                    code: REQUEST_ID_INCONSISTENTE
+                    message: O requestId ja foi usado com outra solicitacao.
+components:
+  schemas:
+    SolicitacaoReservaRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - vagaId
+        - clienteId
+        - requestId
+      properties:
+        vagaId:
+          type: string
+          format: uuid
+        clienteId:
+          type: string
+          format: uuid
+        requestId:
+          type: string
+          format: uuid
+    ReservaConfirmadaResponse:
+      type: object
+      additionalProperties: false
+      required:
+        - reservaId
+        - vagaId
+        - clienteId
+        - requestId
+        - status
+      properties:
+        reservaId:
+          type: string
+          format: uuid
+        vagaId:
+          type: string
+          format: uuid
+        clienteId:
+          type: string
+          format: uuid
+        requestId:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum:
+            - CONFIRMADA
+    ErrorDetail:
+      type: object
+      additionalProperties: false
+      required:
+        - field
+        - message
+      properties:
+        field:
+          type: string
+        message:
+          type: string
+    ValidationErrorResponse:
+      type: object
+      additionalProperties: false
+      required:
+        - code
+        - message
+        - errors
+      properties:
+        requestId:
+          type: string
+          format: uuid
+          nullable: true
+        code:
+          type: string
+          enum:
+            - VALIDATION_ERROR
+        message:
+          type: string
+        errors:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/ErrorDetail'
+    ConflictErrorResponse:
+      type: object
+      additionalProperties: false
+      required:
+        - requestId
+        - code
+        - message
+      properties:
+        requestId:
+          type: string
+          format: uuid
+        code:
+          type: string
+          enum:
+            - VAGA_EM_CONFLITO
+            - REQUEST_ID_INCONSISTENTE
+        message:
+          type: string
