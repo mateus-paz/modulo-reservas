@@ -4,7 +4,7 @@
 
 **Prerequisites**: `plan.md`, `spec.md`, `research.md`, `data-model.md`, `contracts/reservas.openapi.yaml`, `quickstart.md`
 
-**Tests**: Incluidos porque os criterios `SC-002` e `SC-006` exigem verificacao automatizada do contrato executavel e da restricao persistente.
+**Tests**: Incluidos porque os criterios `SC-002`, `SC-004`, `SC-005` e `SC-006` exigem verificacao do contrato executavel, do OpenAPI, da inicializacao com migrations e da restricao persistente.
 
 **Organization**: As tarefas sao agrupadas por historia; replay idempotente, rejeicao executavel de `REQUEST_ID_INCONSISTENTE` e tratamento de disputa simultanea permanecem fora desta entrega.
 
@@ -109,8 +109,9 @@
 
 **Purpose**: Finalizar verificacao operacional e manter a documentacao aderente ao comportamento entregue.
 
-- [ ] T026 [P] Revisar exemplos de execucao, resultados atuais e comportamentos futuros em `specs/001-solicitacao-reserva-idempotente/quickstart.md`
-- [ ] T027 Executar a suite e validar inicializacao com PostgreSQL conteinerizado, registrando eventuais ajustes de execucao em `specs/001-solicitacao-reserva-idempotente/quickstart.md`
+- [ ] T026 [P] Criar verificacao automatizada do contrato OpenAPI para os schemas e codigos definidos de `POST /reservas`, incluindo `REQUEST_ID_INCONSISTENTE` como resposta futura nao executavel, em `src/test/java/com/mateuspaz/reservas/reserva/api/ReservasOpenApiContractTest.java`
+- [ ] T027 [P] Revisar exemplos de execucao, resultados atuais e comportamentos futuros em `specs/001-solicitacao-reserva-idempotente/quickstart.md`
+- [ ] T028 Executar a suite e validar inicializacao com PostgreSQL conteinerizado e migrations Flyway aplicadas, registrando eventuais ajustes de execucao em `specs/001-solicitacao-reserva-idempotente/quickstart.md`
 
 ---
 
@@ -151,6 +152,7 @@ US1 + US2 + US3 -> Polish
 - Em Foundational, `T006` e `T009` podem avancar em arquivos distintos enquanto `T005` define o schema; `T007` depende do schema e enums, e `T008` depende das entidades.
 - Em US1, `T011`, `T012` e `T013` podem ser preparados em paralelo antes de integrar service/controller.
 - Em US3, `T020`, `T021`, `T022` e `T023` cobrem arquivos distintos antes das alteracoes sequenciais em service e handler.
+- Em Polish, `T026` e `T027` podem ser realizados em paralelo antes da validacao final em `T028`.
 
 ## Parallel Example: User Story 1
 

@@ -10,9 +10,10 @@ paths:
       summary: Solicita a confirmacao de uma reserva para uma vaga
       description: >
         Recebe a intencao identificada por requestId. Nesta entrega, confirma
-        vagas disponiveis e rejeita vagas previamente confirmadas. Reenvio
-        consistente e reuso inconsistente do requestId permanecem definidos
-        para implementacao idempotente na fase seguinte.
+        vagas disponiveis e rejeita vagas previamente confirmadas para requestIds
+        novos. Qualquer reapresentacao de requestId permanece fora do comportamento
+        executavel suportado nesta fase; reenvio consistente e reuso inconsistente
+        serao tratados na implementacao idempotente da fase seguinte.
       requestBody:
         required: true
         content:

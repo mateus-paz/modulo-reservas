@@ -63,6 +63,7 @@ Como cliente integrador, quero receber conflito quando solicitar uma vaga que ja
 
 - Na fase seguinte, uma repeticao da solicitacao original ocorrera depois que seu resultado ja foi comunicado ao integrador; ela devera continuar associada ao resultado original, mesmo que a disponibilidade atual da vaga seja diferente.
 - Na fase seguinte, um identificador previamente utilizado e reenviado com alteracao simultanea de vaga e cliente; o resultado devera ser rejeicao por uso inconsistente do identificador.
+- Nesta entrega, uma solicitacao que reutilize `requestId` previamente registrado esta fora do comportamento executavel suportado; testes automatizados nao devem assumir resposta de negocio para esse caso antes da fase de idempotencia.
 - Uma solicitacao combina campos ausentes ou invalidos com um identificador que nao pode ser reconhecido validamente; o resultado e erro de validacao, sem avaliar disponibilidade da vaga.
 - Na fase seguinte, duas solicitacoes validas distintas disputarao a mesma vaga; no maximo uma podera obter confirmacao, e a outra devera receber rejeicao por conflito.
 
@@ -82,6 +83,7 @@ Como cliente integrador, quero receber conflito quando solicitar uma vaga que ja
 - **FR-010**: Uma rejeicao por conflito, validacao ou uso inconsistente do identificador MUST NOT ser apresentada como confirmacao de reserva.
 - **FR-011**: O modelo persistente MUST impedir desde esta entrega que duas reservas confirmadas sejam registradas para a mesma vaga, mesmo que o tratamento controlado de disputas simultaneas seja implementado na fase seguinte.
 - **FR-012**: Nesta entrega, o comportamento executavel da operacao MUST incluir confirmacao de solicitacao valida, erro de validacao e conflito para vaga previamente confirmada; a garantia sob concorrencia simultanea e a idempotencia por identificador MUST permanecer no escopo de implementacao da fase seguinte.
+- **FR-013**: Nesta entrega, reapresentacoes de `requestId` previamente registrado nao fazem parte dos comportamentos executaveis suportados; sua resposta de negocio deterministica sera implementada com a idempotencia na fase seguinte.
 
 ### Key Entities *(include if feature involves data)*
 
@@ -97,8 +99,8 @@ Como cliente integrador, quero receber conflito quando solicitar uma vaga que ja
 - **SC-001**: Em 100% dos cenarios executaveis e formatos contratuais definidos, o cliente integrador consegue distinguir se o resultado e confirmacao, conflito da vaga, erro de validacao ou uso inconsistente do identificador.
 - **SC-002**: Em 100% dos testes executaveis desta entrega, solicitacoes validas confirmadas apresentam vaga, cliente e identificador informados, solicitacoes invalidas apresentam erro de validacao distinguivel e vagas previamente confirmadas apresentam conflito.
 - **SC-003**: O contrato e o modelo persistente desta entrega representam, sem alteracao posterior de formato, os resultados futuros de repeticao consistente, uso inconsistente do identificador e conflito sob disputa simultanea.
-- **SC-004**: Em uma amostra representativa de 100 solicitacoes individuais, pelo menos 95% apresentam seu resultado observavel ao integrador em ate 2 segundos.
-- **SC-005**: Em avaliacao de entendimento com representantes de clientes integradores, pelo menos 90% identificam corretamente a acao a tomar para cada um dos quatro resultados, sem orientacao adicional.
+- **SC-004**: A aplicacao inicializa conectada a PostgreSQL com as migrations Flyway aplicadas, em execucao local ou conteinerizada documentada.
+- **SC-005**: O contrato OpenAPI define payloads e codigos distintos para confirmacao, erro de validacao, conflito da vaga e futuro uso inconsistente do identificador de requisicao.
 - **SC-006**: Em testes da migration desta entrega, 100% das tentativas de registrar uma segunda reserva confirmada para a mesma vaga sao impedidas pelo modelo persistente.
 
 ## Assumptions

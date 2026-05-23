@@ -22,9 +22,9 @@ Estabelecer a fundacao REST e persistente de `POST /reservas` em Java 21 com Spr
 
 **Project Type**: Aplicacao REST backend unica com build Maven
 
-**Performance Goals**: Pelo menos 95% de uma amostra de 100 solicitacoes individuais com resultado observavel em ate 2 segundos, conforme `SC-004`
+**Verification Goals**: Inicializacao com PostgreSQL e Flyway validada; contrato OpenAPI com resultados atuais e futuros distinguiveis; restricao persistente de confirmacao unica comprovada em teste PostgreSQL
 
-**Constraints**: Resultado do endpoint deve ser distinguivel e estavel; PostgreSQL deve impedir desde a migration inicial mais de uma reserva confirmada por vaga; replay e conflito por `requestId` permanecem modelados sem processamento idempotente nesta fase; nenhuma dependencia de RabbitMQ ou Redis nesta fase
+**Constraints**: Resultado do endpoint deve ser distinguivel e estavel; PostgreSQL deve impedir desde a migration inicial mais de uma reserva confirmada por vaga; qualquer reapresentacao de `requestId` permanece fora do comportamento executavel suportado nesta fase, embora replay e conflito por `requestId` estejam modelados para a fase seguinte; nenhuma dependencia de RabbitMQ ou Redis nesta fase
 
 **Scale/Scope**: Uma operacao publica (`POST /reservas`), tres entidades persistentes principais e quatro classes de resultado; fundacao da PoC, sem cancelamento, consulta, eventos ou cache
 
@@ -103,7 +103,7 @@ O detalhamento e as alternativas avaliadas estao em [research.md](./research.md)
 3. Criar a migration inicial para vaga, reserva e resultado de requisicao, incluindo restricoes desenhadas.
 4. Criar DTOs e validacao de entrada conforme contrato e expor `POST /reservas`.
 5. Implementar confirmacao, validacao e conflito para vaga previamente confirmada de forma aderente ao OpenAPI, sem tratar ainda replay ou reuso inconsistente de `requestId`.
-6. Validar inicializacao, migrations, impedimento persistente de duas confirmacoes para uma vaga e contrato HTTP dos comportamentos executaveis desta entrega.
+6. Validar inicializacao, migrations, impedimento persistente de duas confirmacoes para uma vaga, contrato HTTP executavel e schemas OpenAPI definidos para resultados futuros.
 
 ## Complexity Tracking
 
