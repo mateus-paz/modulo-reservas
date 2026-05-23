@@ -24,7 +24,7 @@
 
 ## Decision 3: Contrato de identificadores e endpoint
 
-**Decision**: Definir `POST /reservas` com corpo JSON contendo `vagaId`, `clienteId` e `requestId`, todos no formato UUID. Retornar `201 Created` para confirmacao, `400 Bad Request` para validacao e `409 Conflict` para conflito de vaga ou uso inconsistente de `requestId`, discriminados por codigo de erro.
+**Decision**: Definir `POST /reservas` com corpo JSON contendo `vagaId`, `clienteId` e `requestId`, todos no formato UUID. Nesta entrega, retornar `201 Created` para confirmacao, `400 Bad Request` para validacao e `409 Conflict` para vaga previamente confirmada; manter `409 Conflict` com codigo distinto para uso inconsistente de `requestId` no contrato da fase seguinte.
 
 **Rationale**: O contrato usa identificadores opacos e uniformes, mapeia resultados observaveis da especificacao e separa entrada invalida de conflito de negocio. `409` permite ao integrador distinguir ambas as rejeicoes de negocio pelo codigo estavel.
 
@@ -36,9 +36,9 @@
 
 ## Decision 4: Modelo persistente preparado para a fase seguinte
 
-**Decision**: Modelar `vaga`, `reserva` e `resultado_requisicao`. `reserva` referencia vaga/cliente e suporta estado `CONFIRMADA`; `resultado_requisicao` conserva `requestId`, payload original, classe de resultado, status HTTP e corpo retornavel. Planejar indice unico de reserva confirmada por vaga.
+**Decision**: Modelar `vaga`, `reserva` e `resultado_requisicao`. `reserva` referencia vaga/cliente e suporta estado `CONFIRMADA`; `resultado_requisicao` conserva `requestId`, payload original, classe de resultado, status HTTP e corpo retornavel. A migration inicial inclui indice unico de reserva confirmada por vaga.
 
-**Rationale**: O primeiro resultado valido precisa ser recuperavel sem novo efeito, inclusive quando for conflito. Os dados originais permitem detectar reutilizacao inconsistente. A restricao por vaga transfere a garantia ultima de duplicidade para o banco na fase atomica.
+**Rationale**: Nesta entrega, o endpoint confirma solicitacoes validas e rejeita vaga ja confirmada; o schema impede duplicidade de confirmacao mesmo antes do tratamento controlado de corridas. Os dados de resultado mantem o caminho preparado para detectar reutilizacao inconsistente e reproduzir respostas na fase de idempotencia.
 
 **Alternatives considered**:
 
@@ -58,9 +58,9 @@
 
 ## Decision 6: Limite de escopo da fundacao
 
-**Decision**: Preparar somente aplicacao REST, PostgreSQL, migrations, modelo e contrato; RabbitMQ, Redis, metricas operacionais e implementacao completa da disputa/idempotencia ficam fora desta fase.
+**Decision**: Entregar aplicacao REST, PostgreSQL, migrations, modelo, contrato, confirmacao, validacao e conflito para vaga previamente confirmada. RabbitMQ, Redis, metricas operacionais, replay idempotente e tratamento de disputa simultanea ficam fora desta fase.
 
-**Rationale**: A entrega solicitada e a Fase 1 do roteiro existente. Componentes posteriores nao sao necessarios para inicializacao, contrato e modelo persistente.
+**Rationale**: As clarificacoes exigem comportamento basico verificavel e a protecao persistente contra duplicidade sem antecipar a coordenacao concorrente nem idempotencia da fase seguinte.
 
 **Alternatives considered**:
 

@@ -2,7 +2,7 @@
 
 ## Design Goal
 
-O modelo inicial deve permitir que a aplicacao inicie com migrations versionadas e deve sustentar, sem remodelagem destrutiva, a futura decisao atomica de uma unica reserva confirmada por vaga e a repeticao do resultado por `requestId`.
+O modelo inicial deve permitir que a aplicacao inicie com migrations versionadas, impedir nesta entrega mais de uma reserva confirmada por vaga e sustentar, sem remodelagem destrutiva, a futura repeticao do resultado por `requestId`.
 
 ## Entity: Vaga
 
@@ -33,11 +33,12 @@ Representa uma confirmacao produzida para uma vaga e um cliente.
 
 - Somente uma `reserva` com `status = 'CONFIRMADA'` pode referenciar a mesma `vaga_id`.
 - `request_id` nao pode originar mais de uma reserva.
-- A aplicacao futura deve confirmar a vaga e gravar a reserva na mesma unidade transacional que conclui o resultado da requisicao.
+- A aplicacao desta entrega deve confirmar vagas disponiveis e rejeitar vagas previamente confirmadas.
+- O tratamento controlado de disputas simultaneas sera implementado na fase seguinte, apoiado pela restricao persistente ja existente.
 
 ## Entity: ResultadoRequisicao
 
-Representa o primeiro resultado concluido para um `requestId` valido e fornece material suficiente para replay ou deteccao de uso inconsistente.
+Representa a estrutura preparada para conservar o resultado concluido de um `requestId` valido quando a idempotencia for implementada, fornecendo material suficiente para replay ou deteccao de uso inconsistente.
 
 | Field | Type | Rules | Purpose |
 |-------|------|-------|---------|
@@ -52,11 +53,11 @@ Representa o primeiro resultado concluido para um `requestId` valido e fornece m
 
 ### Result Constraints
 
-- Um `request_id` corresponde a exatamente um payload original e um resultado concluido.
+- Quando a idempotencia for ativada, um `request_id` correspondera a exatamente um payload original e um resultado concluido.
 - `resultado = 'CONFIRMADA'` requer `reserva_id` e `http_status = 201`.
 - `resultado = 'CONFLITO_VAGA'` requer `reserva_id` ausente e `http_status = 409`.
 - Erros de validacao nao geram resultado idempotente, pois nao constituem uma solicitacao valida identificavel.
-- Reutilizacao inconsistente de um `requestId` existente e uma rejeicao da nova tentativa; ela nao substitui o resultado original persistido.
+- Na fase seguinte, reutilizacao inconsistente de um `requestId` existente sera rejeitada sem substituir o resultado original persistido.
 
 ## Relationships
 
@@ -80,17 +81,17 @@ ResultadoRequisicao(CONFLITO_VAGA) --- 0 Reserva
 ```text
 Vaga: LIVRE -> CONFIRMADA
 
-Nova solicitacao valida:
+Nesta entrega, nova solicitacao valida:
   vaga disponivel -> ResultadoRequisicao.CONFIRMADA + Reserva.CONFIRMADA
   vaga indisponivel -> ResultadoRequisicao.CONFLITO_VAGA
 
-Repeticao consistente:
+Na fase seguinte, repeticao consistente:
   ResultadoRequisicao existente -> devolve resultado original sem nova transicao
 
-Repeticao inconsistente:
+Na fase seguinte, repeticao inconsistente:
   ResultadoRequisicao existente + payload diferente -> rejeicao sem alterar estado
 ```
 
 ## Migration Direction
 
-A migration inicial deve criar tipos/restricoes equivalentes para estados validos, chaves estrangeiras e unicidade de `request_id`, alem de um indice unico condicional para impedir duas reservas `CONFIRMADA` para a mesma vaga. A implementacao da logica que aciona essas garantias pode ser entregue em fase posterior; a estrutura nao deve depender de criacao automatica de schema em runtime.
+A migration inicial deve criar tipos/restricoes equivalentes para estados validos, chaves estrangeiras e unicidade de `request_id`, alem de um indice unico condicional que ja impeca duas reservas `CONFIRMADA` para a mesma vaga. Esta entrega exercita confirmacao, validacao, conflito para vaga previamente confirmada e a restricao persistente; a fase seguinte acrescenta replay e traducao controlada de corridas simultaneas.

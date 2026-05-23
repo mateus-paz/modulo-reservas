@@ -9,9 +9,10 @@ paths:
       operationId: solicitarReserva
       summary: Solicita a confirmacao de uma reserva para uma vaga
       description: >
-        Recebe a intencao identificada por requestId. Reenvios consistentes
-        devem reproduzir o resultado original; reuso do requestId com dados
-        distintos deve ser rejeitado.
+        Recebe a intencao identificada por requestId. Nesta entrega, confirma
+        vagas disponiveis e rejeita vagas previamente confirmadas. Reenvio
+        consistente e reuso inconsistente do requestId permanecem definidos
+        para implementacao idempotente na fase seguinte.
       requestBody:
         required: true
         content:
@@ -38,7 +39,9 @@ paths:
               schema:
                 $ref: '#/components/schemas/ValidationErrorResponse'
         '409':
-          description: Vaga em conflito ou reutilizacao inconsistente do requestId.
+          description: >
+            Vaga previamente confirmada nesta entrega, ou reutilizacao
+            inconsistente do requestId conforme contrato da fase seguinte.
           content:
             application/json:
               schema:

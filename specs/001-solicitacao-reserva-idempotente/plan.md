@@ -6,7 +6,7 @@
 
 ## Summary
 
-Estabelecer a fundacao REST e persistente de `POST /reservas` em Java 21 com Spring Boot 3.5.14. A entrega define o contrato HTTP de confirmacao, conflito, validacao e `requestId` inconsistente; modela vaga, reserva confirmada e resultado idempotente; e prepara execucao com PostgreSQL e migrations Flyway. A regra transacional completa de concorrencia e replay sera implementada na fase posterior, mas o schema e o contrato nao devem exigir ruptura para recebe-la.
+Estabelecer a fundacao REST e persistente de `POST /reservas` em Java 21 com Spring Boot 3.5.14. A entrega implementa confirmacao, validacao e conflito para vaga ja confirmada; define o contrato futuro de `requestId` inconsistente e replay; modela vaga, reserva confirmada e resultado de requisicao; e prepara execucao com PostgreSQL e migrations Flyway. A migration inicial impede duas reservas confirmadas por vaga, enquanto o tratamento controlado de disputas simultaneas e a idempotencia completa serao implementados na fase posterior.
 
 ## Technical Context
 
@@ -24,7 +24,7 @@ Estabelecer a fundacao REST e persistente de `POST /reservas` em Java 21 com Spr
 
 **Performance Goals**: Pelo menos 95% de uma amostra de 100 solicitacoes individuais com resultado observavel em ate 2 segundos, conforme `SC-004`
 
-**Constraints**: Resultado do endpoint deve ser distinguivel e estavel; PostgreSQL deve preservar a base para uma unica confirmacao por vaga e replay por `requestId`; nenhuma dependencia de RabbitMQ ou Redis nesta fase
+**Constraints**: Resultado do endpoint deve ser distinguivel e estavel; PostgreSQL deve impedir desde a migration inicial mais de uma reserva confirmada por vaga; replay e conflito por `requestId` permanecem modelados sem processamento idempotente nesta fase; nenhuma dependencia de RabbitMQ ou Redis nesta fase
 
 **Scale/Scope**: Uma operacao publica (`POST /reservas`), tres entidades persistentes principais e quatro classes de resultado; fundacao da PoC, sem cancelamento, consulta, eventos ou cache
 
@@ -34,8 +34,8 @@ Estabelecer a fundacao REST e persistente de `POST /reservas` em Java 21 com Spr
 
 - A constituicao em `.specify/memory/constitution.md` ainda e um template nao ratificado, contendo placeholders e nenhuma regra executavel.
 - Gate inicial: **PASS**. Nao ha principio definido que conflite com Java/Spring/PostgreSQL ou com a delimitacao desta fase.
-- Restricao derivada da especificacao: o plano deve manter resultados observaveis distintos e preparar ausencia de duplicidade/idempotencia; o modelo e o contrato atendem a essa restricao.
-- Reavaliacao pos-design: **PASS**. O contrato define os quatro resultados, e o modelo reserva estruturas e restricoes necessarias para a futura decisao atomica e repeticao persistente.
+- Restricao derivada da especificacao: o plano deve implementar confirmacao, validacao e conflito para vaga previamente confirmada, impedir duplicidade de confirmacao no modelo persistente e reservar idempotencia para a fase seguinte.
+- Reavaliacao pos-design: **PASS**. O contrato define os quatro resultados; o modelo aplica a restricao de confirmacao unica nesta entrega e conserva estruturas necessarias para repeticao persistente futura.
 
 ## Project Structure
 
@@ -86,7 +86,7 @@ O detalhamento e as alternativas avaliadas estao em [research.md](./research.md)
 - manter a versao Spring Boot 3.5.14 ja declarada no projeto e Java 21;
 - usar PostgreSQL como fonte de verdade e Flyway como unico mecanismo de evolucao do schema;
 - definir contrato JSON sincronamente em `POST /reservas`, com `201`, `400` e `409`;
-- persistir resultado por `requestId` e reservar uma restricao de confirmacao unica por vaga para a fase de comportamento atomico;
+- preparar resultado por `requestId` para a fase de idempotencia e aplicar na migration inicial a restricao de confirmacao unica por vaga;
 - usar PostgreSQL real em testes que validem migrations ou garantias dependentes do banco.
 
 ## Phase 1: Design & Contracts
@@ -102,8 +102,8 @@ O detalhamento e as alternativas avaliadas estao em [research.md](./research.md)
 2. Incluir execucao conteinerizada minima (`compose.yaml` e `Dockerfile`) e configuracao local da aplicacao.
 3. Criar a migration inicial para vaga, reserva e resultado de requisicao, incluindo restricoes desenhadas.
 4. Criar DTOs e validacao de entrada conforme contrato e expor `POST /reservas`.
-5. Representar respostas de sucesso e erro de forma aderente ao OpenAPI, deixando a orquestracao transacional completa para a proxima fase.
-6. Validar inicializacao, migrations e contrato HTTP com testes automatizados apropriados.
+5. Implementar confirmacao, validacao e conflito para vaga previamente confirmada de forma aderente ao OpenAPI, sem tratar ainda replay ou reuso inconsistente de `requestId`.
+6. Validar inicializacao, migrations, impedimento persistente de duas confirmacoes para uma vaga e contrato HTTP dos comportamentos executaveis desta entrega.
 
 ## Complexity Tracking
 

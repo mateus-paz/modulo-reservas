@@ -44,8 +44,8 @@ Os testes planejados devem cobrir:
 
 - carregamento da aplicacao com configuracao de teste;
 - aplicacao das migrations contra PostgreSQL;
-- validade das restricoes persistentes que preparam confirmacao unica;
-- contrato HTTP de campos obrigatorios e formatos de resposta.
+- validade da restricao persistente que ja impede duplicidade de confirmacao;
+- contrato HTTP de confirmacao, campos obrigatorios e conflito para vaga previamente confirmada.
 
 ## Inspect The HTTP Contract
 
@@ -73,7 +73,7 @@ curl -i -X POST http://localhost:8080/reservas \
 |-----------|--------|-------------|
 | Reserva confirmada | `201` | response status `CONFIRMADA` |
 | Dados ausentes ou invalidos | `400` | `VALIDATION_ERROR` |
-| Vaga indisponivel | `409` | `VAGA_EM_CONFLITO` |
-| `requestId` reutilizado com outro payload | `409` | `REQUEST_ID_INCONSISTENTE` |
+| Vaga previamente confirmada | `409` | `VAGA_EM_CONFLITO` |
+| `requestId` reutilizado com outro payload (contrato futuro) | `409` | `REQUEST_ID_INCONSISTENTE` |
 
-O comportamento transacional completo de disputa concorrente e replay persistente e alvo da fase seguinte; nesta fase, migrations, contrato e estrutura devem estar preparados para ele.
+Nesta entrega, confirmacao, validacao e conflito para vaga previamente confirmada devem ser executaveis, e a migration deve impedir duplicidade de confirmacao. O tratamento controlado de disputa simultanea e o replay persistente sao alvo da fase seguinte.
